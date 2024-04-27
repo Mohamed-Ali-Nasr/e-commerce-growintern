@@ -5,7 +5,7 @@ import Navbar from "@components/Navbar";
 import { useFormik } from "formik";
 import { useSession } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { categories } from "@constants";
 import { IoIosImages } from "react-icons/io";
 import { BiTrash } from "react-icons/bi";
@@ -278,4 +278,12 @@ const CreateWork = () => {
   );
 };
 
-export default CreateWork;
+const CreateWorkPage = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <CreateWork />
+    </Suspense>
+  );
+};
+
+export default CreateWorkPage;

@@ -5,7 +5,7 @@ import Navbar from "@components/Navbar";
 import WorkList from "@components/WorkList";
 import { useSession } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import "@styles/Shop.scss";
 import { IUser, IWork } from "@types";
 
@@ -65,4 +65,12 @@ const Shop = () => {
   );
 };
 
-export default Shop;
+const ShopPage = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <Shop />
+    </Suspense>
+  );
+};
+
+export default ShopPage;

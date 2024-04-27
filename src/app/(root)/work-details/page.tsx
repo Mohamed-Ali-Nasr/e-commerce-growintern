@@ -2,7 +2,7 @@
 
 import "@styles/WorkDetails.scss";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Loader from "@components/Loader";
 import Navbar from "@components/Navbar";
 import {
@@ -236,4 +236,12 @@ const WorkDetails = () => {
   );
 };
 
-export default WorkDetails;
+const WorkDetailsPage = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <WorkDetails />
+    </Suspense>
+  );
+};
+
+export default WorkDetailsPage;

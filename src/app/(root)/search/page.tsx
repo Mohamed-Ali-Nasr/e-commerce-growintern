@@ -4,11 +4,11 @@ import "@styles/Search.scss";
 import Loader from "@components/Loader";
 import Navbar from "@components/Navbar";
 import WorkList from "@components/WorkList";
-import { useParams, useSearchParams } from "next/navigation";
-import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect, Suspense } from "react";
 import { IWork } from "@types";
 
-const SearchPage = () => {
+const Search = () => {
   const searchParams = useSearchParams();
   const query = searchParams.get("query");
 
@@ -45,6 +45,14 @@ const SearchPage = () => {
 
       <WorkList data={workList} />
     </>
+  );
+};
+
+const SearchPage = () => {
+  return (
+    <Suspense fallback={<Loader />}>
+      <Search />
+    </Suspense>
   );
 };
 

@@ -4,6 +4,7 @@ import { mkdir, stat, writeFile } from "fs/promises";
 import { join } from "path";
 import mime from "mime";
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 
 export async function POST(req: Request) {
   try {
@@ -83,6 +84,8 @@ export async function POST(req: Request) {
     });
 
     await newWork.save();
+
+    revalidatePath("/");
 
     return new Response(JSON.stringify(newWork), { status: 200 });
   } catch (err) {

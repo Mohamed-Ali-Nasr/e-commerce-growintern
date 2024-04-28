@@ -5,6 +5,7 @@ import { mkdir, stat, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
 import { join } from "path";
 import mime from "mime";
+import { revalidatePath } from "next/cache";
 
 /* USER REGISTER */
 export const POST = async (req: Request) => {
@@ -89,6 +90,8 @@ export const POST = async (req: Request) => {
 
     /* Save new User */
     await newUser.save();
+
+    revalidatePath("/");
 
     /* Send a success message */
     return NextResponse.json(

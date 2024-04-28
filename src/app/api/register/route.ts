@@ -1,8 +1,10 @@
 import { connectToDatabase } from "@lib/database";
 import User from "@lib/database/models/user.model";
 import { hash } from "bcryptjs";
-import { writeFile } from "fs/promises";
+import { mkdir, stat, writeFile } from "fs/promises";
 import { NextResponse } from "next/server";
+import { join } from "path";
+import mime from "mime";
 
 /* USER REGISTER */
 export const POST = async (req: Request) => {
@@ -28,10 +30,41 @@ export const POST = async (req: Request) => {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const profileImagePath = `D:/MernStack-Projects/ClonesOfBiggerWebsites/e-commerce-growintern/public/uploads/${file.name}`;
-    await writeFile(profileImagePath, buffer);
+    const relativeUploadDir = `/uploads/${new Date(Date.now())
+      .toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      })
+      .replace(/\//g, "-")}`;
 
-    console.log(`open ${profileImagePath} to see the uploaded files`);
+    const uploadDir = join(process.cwd(), "public", relativeUploadDir);
+
+    try {
+      await stat(uploadDir);
+    } catch (e: any) {
+      if (e.code === "ENOENT") {
+        // This is for checking the directory is exist (ENOENT : Error No Entry)
+        await mkdir(uploadDir, { recursive: true });
+      } else {
+        console.error(
+          "Error while trying to create directory when uploading a file\n",
+          e
+        );
+        return NextResponse.json(
+          { error: "Something went wrong." },
+          { status: 500 }
+        );
+      }
+    }
+
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+    const filename = `${file.name.replace(
+      /\.[^/.]+$/,
+      ""
+    )}-${uniqueSuffix}.${mime.getExtension(file.type)}`;
+    await writeFile(`${uploadDir}/${filename}`, buffer);
+    const fileUrl = `${relativeUploadDir}/${filename}`;
 
     /* Check if user exists */
     const existingUser = await User.findOne({ email });
@@ -51,7 +84,7 @@ export const POST = async (req: Request) => {
       username,
       email,
       password: hashedPassword,
-      profileImagePath: `/uploads/${file.name}`,
+      profileImagePath: fileUrl,
     });
 
     /* Save new User */
